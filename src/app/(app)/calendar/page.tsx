@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AppHeader } from "@/components/AppHeader";
 import { PlanEditSheet } from "@/components/PlanEditSheet";
 import { ShiftEditSheet } from "@/components/ShiftEditSheet";
@@ -38,11 +38,19 @@ export default function CalendarPage() {
   const [selected, setSelected] = useState<string>(todayYmd());
   const [editingShift, setEditingShift] = useState<Shift | null>(null);
   const [editingPlan, setEditingPlan] = useState<Plan | null>(null);
+  const detailsRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     setShifts(getShifts());
     setPlans(getPlans());
   }, []);
+
+  const selectDate = (key: string) => {
+    setSelected(key);
+    setTimeout(() => {
+      detailsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
+  };
 
   const cells = daysInMonthGrid(cursor.getFullYear(), cursor.getMonth());
 
@@ -147,7 +155,7 @@ export default function CalendarPage() {
               return (
                 <button
                   key={i}
-                  onClick={() => setSelected(key)}
+                  onClick={() => selectDate(key)}
                   className={`min-h-[88px] border-b border-r border-border last:border-r-0 text-left p-1.5 flex flex-col transition ${
                     inMonth ? "bg-white" : "bg-background/40"
                   } ${isSelected ? "ring-4 ring-primary ring-inset" : ""}`}
@@ -165,7 +173,7 @@ export default function CalendarPage() {
                   >
                     {d.getDate()}
                   </span>
-                  <div className="flex flex-col gap-0.5 mt-0.5">
+                  <div className="flex flex-col gap-0.5 mt-1">
                     {dayShifts.slice(0, 2).map((s) => {
                       const p = findPattern(s.patternCode);
                       const short = p
@@ -174,10 +182,9 @@ export default function CalendarPage() {
                       return (
                         <span
                           key={s.id}
-                          className="text-xs leading-tight rounded px-1 py-0.5 text-white font-bold truncate"
+                          className="text-sm leading-tight rounded px-1 py-0.5 text-white font-bold text-center truncate"
                           style={{ backgroundColor: USERS[s.userId].color }}
                         >
-                          {USERS[s.userId].emoji}
                           {short}
                         </span>
                       );
@@ -194,36 +201,44 @@ export default function CalendarPage() {
           </div>
         </div>
 
-        <section className="mt-5 bg-white rounded-2xl border border-border p-4">
-          <h3 className="text-lg font-bold mb-3">
-            {selected.replaceAll("-", "/")} の予定
+        <section
+          ref={detailsRef}
+          className="mt-5 bg-white rounded-2xl border-2 border-primary/20 p-4 scroll-mt-24"
+        >
+          <h3 className="text-xl font-bold mb-3 text-primary">
+            📌 {selected.replaceAll("-", "/")} の予定
           </h3>
           {selectedShifts.length === 0 && selectedPlans.length === 0 ? (
             <p className="text-muted text-base py-4 text-center">
               予定はありません
             </p>
           ) : (
-            <ul className="space-y-3">
+            <ul className="space-y-2">
               {selectedShifts.map((s) => (
                 <li key={s.id}>
                   <button
                     onClick={() => setEditingShift(s)}
-                    className="w-full text-left flex items-center gap-3 rounded-xl p-3 border-l-8 hover:shadow-sm active:scale-[0.99] transition"
+                    className="w-full text-left flex items-center gap-2 rounded-xl py-2 px-3 border-l-4 active:scale-[0.99] transition"
                     style={{
                       borderLeftColor: USERS[s.userId].color,
                       backgroundColor: `${USERS[s.userId].color}10`,
                     }}
                   >
-                    <span className="text-3xl">{USERS[s.userId].emoji}</span>
-                    <div className="flex-1">
-                      <div className="font-bold text-lg">
+                    <span
+                      className="inline-flex items-center justify-center w-10 h-10 rounded-full text-white text-sm font-bold shrink-0"
+                      style={{ backgroundColor: USERS[s.userId].color }}
+                    >
+                      {USERS[s.userId].name.slice(0, 1)}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-bold text-base truncate">
                         {USERS[s.userId].name}のシフト
                       </div>
-                      <div className="text-base text-muted">
+                      <div className="text-sm text-muted truncate">
                         {describeShift(s)}
                       </div>
                     </div>
-                    <span className="text-muted text-xl">✎</span>
+                    <span className="text-muted text-base font-bold px-2">✎</span>
                   </button>
                 </li>
               ))}
@@ -231,26 +246,30 @@ export default function CalendarPage() {
                 <li key={p.id}>
                   <button
                     onClick={() => setEditingPlan(p)}
-                    className="w-full text-left flex items-center gap-3 rounded-xl p-3 bg-accent/10 border-l-8 border-accent hover:shadow-sm active:scale-[0.99] transition"
+                    className="w-full text-left flex items-center gap-2 rounded-xl py-2 px-3 bg-accent/10 border-l-4 border-accent active:scale-[0.99] transition"
                   >
-                    <span className="text-3xl">⭐</span>
-                    <div className="flex-1">
-                      <div className="font-bold text-lg">{p.title}</div>
-                      <div className="text-base text-muted">
+                    <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-accent/20 text-accent text-xl shrink-0">
+                      ⭐
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-bold text-base truncate">{p.title}</div>
+                      <div className="text-sm text-muted truncate">
                         {p.startTime
                           ? `${p.startTime}${p.endTime ? ` 〜 ${p.endTime}` : ""}`
                           : "時間未定"}
                       </div>
                     </div>
-                    <span className="text-muted text-xl">✎</span>
+                    <span className="text-muted text-base font-bold px-2">✎</span>
                   </button>
                 </li>
               ))}
             </ul>
           )}
-          <p className="mt-3 text-sm text-muted text-center">
-            ✎ タップで修正・削除できます
-          </p>
+          {(selectedShifts.length > 0 || selectedPlans.length > 0) && (
+            <p className="mt-3 text-sm text-muted text-center">
+              ✎ タップで修正・削除できます
+            </p>
+          )}
         </section>
       </main>
 

@@ -60,9 +60,9 @@ export default function MemoPage() {
 
   return (
     <>
-      <AppHeader title="メモ・買い物リスト" user={user} />
-      <main className="flex-1 max-w-md w-full mx-auto px-5 py-5 space-y-5">
-        <section className="bg-white rounded-2xl border border-border p-4">
+      <AppHeader title="メモ" user={user} />
+      <main className="flex-1 max-w-md w-full mx-auto px-4 py-4 space-y-4">
+        <section className="bg-white rounded-2xl border border-border p-3">
           <div className="flex items-center gap-2">
             <input
               type="text"
@@ -70,11 +70,11 @@ export default function MemoPage() {
               onChange={(e) => setText(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && add()}
               placeholder="例：牛乳"
-              className="flex-1 rounded-xl border-2 border-border px-4 bg-white"
+              className="flex-1 rounded-xl border-2 border-border px-3 bg-white"
             />
             <button
               onClick={add}
-              className="rounded-xl bg-primary text-white px-6 text-lg font-bold"
+              className="rounded-xl bg-primary text-white px-5 text-base font-bold"
               aria-label="追加"
             >
               ＋追加
@@ -83,34 +83,36 @@ export default function MemoPage() {
         </section>
 
         <section>
-          <h3 className="font-bold text-lg mb-2 px-1">
+          <h3 className="font-bold text-base mb-2 px-1">
             のこり（{remaining.length}件）
           </h3>
           {remaining.length === 0 ? (
-            <p className="text-muted text-center py-6 bg-white rounded-2xl border border-border">
+            <p className="text-muted text-center py-4 bg-white rounded-xl border border-border text-base">
               メモはありません
             </p>
           ) : (
-            <ul className="space-y-2">
+            <ul className="bg-white rounded-2xl border border-border divide-y divide-border overflow-hidden">
               {remaining.map((m) => (
                 <li
                   key={m.id}
-                  className="bg-white rounded-2xl border border-border px-3 py-2 flex items-center gap-3"
+                  className="flex items-center gap-2 pl-2 pr-2"
                 >
                   <button
                     onClick={() => toggle(m.id)}
-                    className="w-12 h-12 rounded-full border-2 border-primary flex items-center justify-center text-2xl shrink-0"
+                    className="w-11 h-11 rounded-full border-2 border-primary flex items-center justify-center shrink-0 compact"
                     aria-label="完了にする"
                   >
-                    {" "}
+                    <span className="sr-only">未完了</span>
                   </button>
-                  <span className="flex-1 text-lg">{m.text}</span>
+                  <span className="flex-1 text-base py-3 break-words">
+                    {m.text}
+                  </span>
                   <button
                     onClick={() => remove(m.id)}
-                    className="text-red-600 text-base font-bold px-3 py-2 border-2 border-red-200 rounded-lg"
+                    className="w-11 h-11 rounded-full bg-red-50 text-red-600 flex items-center justify-center shrink-0 text-xl font-bold compact"
                     aria-label="削除"
                   >
-                    消す
+                    ✕
                   </button>
                 </li>
               ))}
@@ -121,36 +123,38 @@ export default function MemoPage() {
         {done.length > 0 && (
           <section>
             <div className="flex items-center justify-between mb-2 px-1">
-              <h3 className="font-bold text-lg">
+              <h3 className="font-bold text-base">
                 完了（{done.length}件）
               </h3>
               <button
                 onClick={clearDone}
-                className="text-base text-red-600 font-semibold"
+                className="text-sm text-red-600 font-semibold compact px-3 py-1"
               >
                 まとめて消す
               </button>
             </div>
-            <ul className="space-y-2">
+            <ul className="bg-background rounded-2xl border border-border divide-y divide-border overflow-hidden opacity-75">
               {done.map((m) => (
                 <li
                   key={m.id}
-                  className="bg-background rounded-2xl border border-border px-3 py-2 flex items-center gap-3 opacity-70"
+                  className="flex items-center gap-2 pl-2 pr-2"
                 >
                   <button
                     onClick={() => toggle(m.id)}
-                    className="w-12 h-12 rounded-full bg-primary border-2 border-primary flex items-center justify-center text-2xl text-white shrink-0"
+                    className="w-11 h-11 rounded-full bg-primary border-2 border-primary flex items-center justify-center text-xl text-white shrink-0 compact"
                     aria-label="戻す"
                   >
                     ✓
                   </button>
-                  <span className="flex-1 text-lg line-through">{m.text}</span>
+                  <span className="flex-1 text-base py-3 line-through break-words">
+                    {m.text}
+                  </span>
                   <button
                     onClick={() => remove(m.id)}
-                    className="text-red-600 text-base font-bold px-3 py-2 border-2 border-red-200 rounded-lg"
+                    className="w-11 h-11 rounded-full bg-red-50 text-red-600 flex items-center justify-center shrink-0 text-xl font-bold compact"
                     aria-label="削除"
                   >
-                    消す
+                    ✕
                   </button>
                 </li>
               ))}
