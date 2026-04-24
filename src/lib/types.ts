@@ -23,14 +23,17 @@ export type ShiftPattern = {
   startTime?: string;
   endTime?: string;
   isLeave?: boolean;
+  userId?: UserId;
 };
 
 export const SHIFT_PATTERNS: ShiftPattern[] = [
-  { code: "E", label: "早番 勤務", startTime: "10:00", endTime: "16:30" },
-  { code: "A", label: "早番A 勤務", startTime: "10:00", endTime: "17:30" },
-  { code: "F", label: "中番 勤務", startTime: "15:30", endTime: "23:30" },
-  { code: "B", label: "遅番 勤務", startTime: "17:00", endTime: "23:30" },
-  { code: "E休", label: "早番 有給", startTime: "10:00", endTime: "16:30", isLeave: true },
+  { code: "E", label: "早番 勤務", startTime: "10:00", endTime: "16:30", userId: "mom" },
+  { code: "A", label: "早番A 勤務", startTime: "10:00", endTime: "17:30", userId: "mom" },
+  { code: "F", label: "中番 勤務", startTime: "15:30", endTime: "23:30", userId: "mom" },
+  { code: "B", label: "遅番 勤務", startTime: "17:00", endTime: "23:30", userId: "mom" },
+  { code: "E休", label: "早番 有給", startTime: "10:00", endTime: "16:30", isLeave: true, userId: "mom" },
+  { code: "物", label: "夜→物流", userId: "son" },
+  { code: "C", label: "夜→コールセンター", userId: "son" },
 ];
 
 export function findPattern(code?: string): ShiftPattern | undefined {
@@ -38,11 +41,16 @@ export function findPattern(code?: string): ShiftPattern | undefined {
   return SHIFT_PATTERNS.find((p) => p.code === code);
 }
 
+export function getPatternsForUser(userId: UserId): ShiftPattern[] {
+  return SHIFT_PATTERNS.filter((p) => !p.userId || p.userId === userId);
+}
+
 export function describeShift(shift: Pick<Shift, "patternCode" | "startTime" | "endTime" | "note">): string {
   const p = findPattern(shift.patternCode);
   if (p) {
     if (p.isLeave) return `${p.code}（${p.label}）`;
-    return `${p.code}  ${p.startTime}〜${p.endTime}`;
+    if (p.startTime && p.endTime) return `${p.code}  ${p.startTime}〜${p.endTime}`;
+    return p.label;
   }
   if (shift.startTime && shift.endTime) return `${shift.startTime}〜${shift.endTime}`;
   return shift.note ?? "時間未定";

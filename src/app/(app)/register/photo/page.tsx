@@ -12,7 +12,7 @@ import {
   ymd,
 } from "@/lib/date";
 import { getShifts, saveShifts, uid } from "@/lib/storage";
-import { SHIFT_PATTERNS, findPattern } from "@/lib/types";
+import { findPattern, getPatternsForUser } from "@/lib/types";
 
 type Draft = {
   date: string;
@@ -386,6 +386,7 @@ export default function PhotoRegisterPage() {
         <EditSheet
           date={editingDate}
           currentCode={editingDraft?.patternCode}
+          userId={user.id}
           onPick={(code) => {
             setCodeForDate(editingDate, code);
             setEditingDate(null);
@@ -404,12 +405,14 @@ export default function PhotoRegisterPage() {
 function EditSheet({
   date,
   currentCode,
+  userId,
   onPick,
   onDelete,
   onClose,
 }: {
   date: string;
   currentCode?: string;
+  userId: "mom" | "son";
   onPick: (code: string) => void;
   onDelete: () => void;
   onClose: () => void;
@@ -430,7 +433,7 @@ function EditSheet({
         </h3>
 
         <div className="space-y-2">
-          {SHIFT_PATTERNS.map((sp) => {
+          {getPatternsForUser(userId).map((sp) => {
             const active = currentCode === sp.code;
             return (
               <button
@@ -448,9 +451,11 @@ function EditSheet({
                 <div className="flex-1">
                   <div className="font-bold text-lg">{sp.label}</div>
                   <div className="text-sm opacity-80">
-                    {sp.isLeave
-                      ? `${sp.startTime}〜${sp.endTime}（有給）`
-                      : `${sp.startTime}〜${sp.endTime}`}
+                    {sp.startTime && sp.endTime
+                      ? `${sp.startTime}〜${sp.endTime}${sp.isLeave ? "（有給）" : ""}`
+                      : sp.isLeave
+                      ? "有給"
+                      : ""}
                   </div>
                 </div>
                 {active && <span className="text-2xl">✓</span>}

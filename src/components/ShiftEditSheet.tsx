@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { SHIFT_PATTERNS, findPattern, type Shift } from "@/lib/types";
+import { findPattern, getPatternsForUser, type Shift } from "@/lib/types";
 
 type Props = {
   shift: Shift;
@@ -53,6 +53,8 @@ export function ShiftEditSheet({
     });
   };
 
+  const patterns = getPatternsForUser(shift.userId);
+
   const handleDelete = () => {
     if (!confirm("このシフトを消しますか？")) return;
     onDelete();
@@ -77,7 +79,7 @@ export function ShiftEditSheet({
         <div className="mb-4">
           <div className="font-bold mb-2">シフト種別</div>
           <div className="flex flex-wrap gap-2">
-            {SHIFT_PATTERNS.map((sp) => {
+            {patterns.map((sp) => {
               const active = patternCode === sp.code;
               return (
                 <button
@@ -93,7 +95,9 @@ export function ShiftEditSheet({
                   <span className="ml-1 text-xs font-normal">
                     {sp.isLeave
                       ? "有給"
-                      : `${sp.startTime?.slice(0, 5)}-${sp.endTime?.slice(0, 5)}`}
+                      : sp.startTime && sp.endTime
+                      ? `${sp.startTime.slice(0, 5)}-${sp.endTime.slice(0, 5)}`
+                      : sp.label.replace(`${sp.code}`, "").trim() || ""}
                   </span>
                 </button>
               );

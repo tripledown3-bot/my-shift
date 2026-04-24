@@ -81,11 +81,11 @@ export function seedIfEmpty(): void {
     { id: uid(), userId: "mom", date: ymd(5), patternCode: "A" },
     { id: uid(), userId: "mom", date: ymd(10), patternCode: "F" },
     { id: uid(), userId: "mom", date: ymd(17), patternCode: "E" },
-    { id: uid(), userId: "son", date: ymd(4), startTime: "10:00", endTime: "19:00" },
-    { id: uid(), userId: "son", date: ymd(5), startTime: "10:00", endTime: "19:00" },
-    { id: uid(), userId: "son", date: ymd(11), startTime: "10:00", endTime: "19:00" },
-    { id: uid(), userId: "son", date: ymd(12), startTime: "10:00", endTime: "19:00" },
-    { id: uid(), userId: "son", date: ymd(18), startTime: "10:00", endTime: "19:00" },
+    { id: uid(), userId: "son", date: ymd(4), patternCode: "物" },
+    { id: uid(), userId: "son", date: ymd(5), patternCode: "C" },
+    { id: uid(), userId: "son", date: ymd(11), patternCode: "物" },
+    { id: uid(), userId: "son", date: ymd(12), patternCode: "C" },
+    { id: uid(), userId: "son", date: ymd(18), patternCode: "物" },
   ];
 
   const plans: Plan[] = [
@@ -98,6 +98,7 @@ export function seedIfEmpty(): void {
     { id: uid(), userId: "mom", text: "牛乳", done: false, createdAt: new Date().toISOString() },
     { id: uid(), userId: "mom", text: "食パン", done: false, createdAt: new Date().toISOString() },
     { id: uid(), userId: "mom", text: "電池（単3）", done: true, createdAt: new Date().toISOString() },
+    { id: uid(), userId: "son", text: "餌", done: false, createdAt: new Date().toISOString() },
     { id: uid(), userId: "son", text: "シャンプー", done: false, createdAt: new Date().toISOString() },
   ];
 

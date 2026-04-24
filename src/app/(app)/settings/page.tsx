@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
 import { useCurrentUser } from "@/components/UserContext";
 import { clearAll, setCurrentUser } from "@/lib/storage";
-import { SHIFT_PATTERNS } from "@/lib/types";
+import { getPatternsForUser } from "@/lib/types";
 
 export default function SettingsPage() {
   const user = useCurrentUser();
@@ -48,9 +48,11 @@ export default function SettingsPage() {
         </section>
 
         <section className="bg-white rounded-2xl border border-border p-5">
-          <h3 className="font-bold text-lg mb-3">シフト種別（由美用）</h3>
+          <h3 className="font-bold text-lg mb-3">
+            シフト種別（{user.name}用）
+          </h3>
           <ul className="divide-y divide-border">
-            {SHIFT_PATTERNS.map((p) => (
+            {getPatternsForUser(user.id).map((p) => (
               <li key={p.code} className="flex items-center gap-3 py-2.5">
                 <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary text-white font-bold">
                   {p.code}
@@ -60,7 +62,9 @@ export default function SettingsPage() {
                   <div className="text-base text-muted">
                     {p.isLeave
                       ? "有給休暇"
-                      : `${p.startTime} 〜 ${p.endTime}`}
+                      : p.startTime && p.endTime
+                      ? `${p.startTime} 〜 ${p.endTime}`
+                      : "時間なし"}
                   </div>
                 </div>
               </li>

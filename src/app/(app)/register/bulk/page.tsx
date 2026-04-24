@@ -11,7 +11,7 @@ import {
   ymd,
 } from "@/lib/date";
 import { getShifts, saveShifts, uid } from "@/lib/storage";
-import { SHIFT_PATTERNS } from "@/lib/types";
+import { SHIFT_PATTERNS, getPatternsForUser } from "@/lib/types";
 
 export default function BulkRegisterPage() {
   const user = useCurrentUser();
@@ -72,7 +72,7 @@ export default function BulkRegisterPage() {
         <section className="bg-white rounded-2xl border border-border p-4">
           <h3 className="font-bold text-lg mb-2">① シフト種別（任意）</h3>
           <div className="flex flex-wrap gap-2 mb-3">
-            {SHIFT_PATTERNS.map((sp) => {
+            {getPatternsForUser(user.id).map((sp) => {
               const active = patternCode === sp.code;
               return (
                 <button
@@ -93,7 +93,9 @@ export default function BulkRegisterPage() {
                   <span className="ml-1 text-xs font-normal">
                     {sp.isLeave
                       ? "有給"
-                      : `${sp.startTime?.slice(0, 5)}-${sp.endTime?.slice(0, 5)}`}
+                      : sp.startTime && sp.endTime
+                      ? `${sp.startTime.slice(0, 5)}-${sp.endTime.slice(0, 5)}`
+                      : sp.label.replace(`${sp.code}`, "").trim() || ""}
                   </span>
                 </button>
               );
