@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f7f5ef;
+  --foreground: #1e2b22;
+  --primary: #2d5a3d;
+  --primary-dark: #1f3f2a;
+  --accent: #d97706;
+  --mom: #c2410c;
+  --son: #1d4ed8;
+  --muted: #6b7280;
+  --card: #ffffff;
+  --border: #d6d3c5;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+  --color-accent: var(--accent);
+  --color-mom: var(--mom);
+  --color-son: var(--son);
+  --color-muted: var(--muted);
+  --color-card: var(--card);
+  --color-border: var(--border);
+}
+
+html {
+  font-size: 20px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 22px;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: "Hiragino Sans", "Yu Gothic", "Meiryo", system-ui, sans-serif;
+  font-feature-settings: "palt";
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+a[role="button"],
+[role="button"] {
+  min-height: 64px;
+  font-weight: 600;
+  touch-action: manipulation;
+}
+
+button.compact {
+  min-height: 48px;
+}
+
+input, select, textarea {
+  font-size: max(1rem, 16px);
+  min-height: 56px;
+  touch-action: manipulation;
+}
+
+input[type="time"],
+input[type="date"] {
+  font-size: max(1.05rem, 16px);
+}
+
+.safe-bottom {
+  padding-bottom: max(env(safe-area-inset-bottom), 12px);
+}
+
+@media (hover: hover) {
+  button:hover,
+  a[role="button"]:hover {
+    filter: brightness(1.03);
+  }
+}
