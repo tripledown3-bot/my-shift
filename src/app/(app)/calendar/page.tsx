@@ -244,15 +244,12 @@ export default function CalendarPage() {
                         </span>
                       );
                     })}
-                    {dayPlans.length > 0 && (() => {
-                      const hasFeed = dayPlans.some((p) => p.title === "餌");
-                      const hasOther = dayPlans.some((p) => p.title !== "餌");
-                      return (
-                        <span className="text-xs leading-tight rounded px-1 py-[1px] bg-accent/20 text-accent font-bold text-center truncate">
-                          {hasFeed && hasOther ? "●★" : hasFeed ? "●" : "★"}
-                        </span>
-                      );
-                    })()}
+                    {dayPlans.length > 0 && (
+                      <span className="text-xs leading-tight rounded px-1 py-[1px] bg-accent/20 text-accent font-bold text-center truncate">
+                        {dayPlans[0].title.slice(0, 3)}
+                        {dayPlans.length > 1 ? "…" : ""}
+                      </span>
+                    )}
                   </div>
                 </button>
               );
