@@ -1,3 +1,18 @@
+import holiday_jp from "@holiday-jp/holiday_jp";
+
+export function isJapaneseHoliday(d: Date): boolean {
+  return holiday_jp.isHoliday(d);
+}
+
+export function holidayName(d: Date): string | null {
+  const key = ymd(d);
+  const holidays = holiday_jp.holidays as Record<
+    string,
+    { name: string } | undefined
+  >;
+  return holidays[key]?.name ?? null;
+}
+
 export function ymd(d: Date): string {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, "0");

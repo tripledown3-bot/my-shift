@@ -8,8 +8,10 @@ import { useCurrentUser } from "@/components/UserContext";
 import {
   WEEKDAY_JA,
   daysInMonthGrid,
+  holidayName,
   isSameDay,
   monthLabel,
+  parseYmd,
   todayYmd,
   ymd,
 } from "@/lib/date";
@@ -96,6 +98,7 @@ export default function CalendarPage() {
 
   const selectedShifts = shiftsByDate.get(selected) ?? [];
   const selectedPlans = plansByDate.get(selected) ?? [];
+  const selectedHolidayName = holidayName(parseYmd(selected));
 
   const prev = () =>
     setCursor(new Date(cursor.getFullYear(), cursor.getMonth() - 1, 1));
@@ -194,6 +197,8 @@ export default function CalendarPage() {
               const dayShifts = shiftsByDate.get(key) ?? [];
               const dayPlans = plansByDate.get(key) ?? [];
               const weekday = d.getDay();
+              const holiday = holidayName(d);
+              const isHoliday = holiday !== null;
 
               return (
                 <button
@@ -202,12 +207,13 @@ export default function CalendarPage() {
                   className={`min-h-[80px] border-b border-r border-border last:border-r-0 text-left p-1 flex flex-col items-stretch transition ${
                     inMonth ? "bg-white" : "bg-background/40"
                   } ${isSelected ? "ring-4 ring-primary ring-inset" : ""}`}
+                  title={holiday ?? undefined}
                 >
                   <span
                     className={`text-base font-bold leading-none ${
                       isToday
                         ? "bg-primary text-white rounded-full w-7 h-7 mx-auto flex items-center justify-center"
-                        : weekday === 0
+                        : isHoliday || weekday === 0
                         ? "text-red-600"
                         : weekday === 6
                         ? "text-blue-600"
@@ -250,6 +256,11 @@ export default function CalendarPage() {
         >
           <h3 className="text-xl font-bold mb-3 text-primary">
             📌 {selected.replaceAll("-", "/")} の予定
+            {selectedHolidayName && (
+              <span className="ml-2 text-base text-red-600">
+                🎌 {selectedHolidayName}
+              </span>
+            )}
           </h3>
           {selectedShifts.length === 0 && selectedPlans.length === 0 ? (
             <p className="text-muted text-base py-4 text-center">
