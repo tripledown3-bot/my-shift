@@ -41,6 +41,24 @@ export function todayFullLabel(d: Date = new Date()): string {
   return `本日: ${r}${d.getMonth() + 1}月${d.getDate()}日(${WEEKDAY_JA[d.getDay()]})`;
 }
 
+export function relativeDateLabel(yyyymmdd: string): string {
+  const target = parseYmd(yyyymmdd);
+  target.setHours(0, 0, 0, 0);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const diff = Math.round(
+    (target.getTime() - today.getTime()) / (24 * 60 * 60 * 1000)
+  );
+  const md = `${target.getMonth() + 1}/${target.getDate()}(${
+    WEEKDAY_JA[target.getDay()]
+  })`;
+  if (diff === 0) return `今日 ${md}`;
+  if (diff === 1) return `明日 ${md}`;
+  if (diff === 2) return `明後日 ${md}`;
+  if (diff < 0) return `${-diff}日前 ${md}`;
+  return `${diff}日後 ${md}`;
+}
+
 export function daysInMonthGrid(year: number, month: number): Date[] {
   const first = new Date(year, month, 1);
   const firstWeekday = first.getDay();
