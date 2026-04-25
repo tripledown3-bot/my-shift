@@ -310,7 +310,7 @@ export default function CalendarPage() {
                     })}
                     {dayPlans.length > 0 && (
                       <span
-                        className="text-[10px] leading-[1.15] rounded px-0.5 py-[1px] bg-accent/20 text-accent font-bold text-center break-all overflow-hidden"
+                        className="text-[10px] leading-[1.15] rounded px-0.5 py-[1px] bg-accent/20 text-foreground font-bold text-center break-all overflow-hidden"
                         style={{
                           display: "-webkit-box",
                           WebkitLineClamp: 2,
