@@ -13,7 +13,6 @@ import {
   monthLabel,
   parseYmd,
   reiwaLabel,
-  relativeDateLabel,
   todayFullLabel,
   todayYmd,
   ymd,
@@ -145,18 +144,6 @@ export default function CalendarPage() {
   const selectedPlans = plansByDate.get(selected) ?? [];
   const selectedHolidayName = holidayName(parseYmd(selected));
 
-  const todayStr = todayYmd();
-  const nextShift = useMemo(() => {
-    return shifts
-      .filter((s) => s.userId === user.id && s.date >= todayStr)
-      .sort((a, b) => a.date.localeCompare(b.date))[0];
-  }, [shifts, user.id, todayStr]);
-  const nextPlan = useMemo(() => {
-    return plans
-      .filter((p) => p.userId === user.id && p.date >= todayStr)
-      .sort((a, b) => a.date.localeCompare(b.date))[0];
-  }, [plans, user.id, todayStr]);
-
   const prev = () =>
     setCursor(new Date(cursor.getFullYear(), cursor.getMonth() - 1, 1));
   const next = () =>
@@ -255,41 +242,6 @@ export default function CalendarPage() {
             </div>
           )}
         </section>
-
-        {(nextShift || nextPlan) && (
-          <section className="mb-3 bg-white rounded-2xl border border-border p-3 space-y-1.5">
-            {nextShift && (
-              <div className="flex items-baseline gap-2 text-sm leading-tight">
-                <span
-                  className="font-bold w-20 shrink-0"
-                  style={{ color: USERS[nextShift.userId].color }}
-                >
-                  🟢 次のシフト
-                </span>
-                <span className="font-bold text-base text-foreground truncate">
-                  {relativeDateLabel(nextShift.date)}
-                </span>
-                <span className="text-muted text-xs truncate">
-                  {describeShift(nextShift)}
-                </span>
-              </div>
-            )}
-            {nextPlan && (
-              <div className="flex items-baseline gap-2 text-sm leading-tight">
-                <span className="font-bold w-20 shrink-0 text-accent">
-                  ⭐ 次の予定
-                </span>
-                <span className="font-bold text-base text-foreground truncate">
-                  {relativeDateLabel(nextPlan.date)}
-                </span>
-                <span className="text-muted text-xs truncate">
-                  {nextPlan.title}
-                  {nextPlan.startTime ? ` ${nextPlan.startTime}` : ""}
-                </span>
-              </div>
-            )}
-          </section>
-        )}
 
         {loading && (
           <p className="text-center text-muted py-2">読み込み中…</p>
