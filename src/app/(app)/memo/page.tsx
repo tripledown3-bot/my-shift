@@ -103,6 +103,16 @@ export default function MemoPage() {
             ⚠ {errorMsg}
           </p>
         )}
+        <section className="bg-primary/5 rounded-2xl border border-primary/20 p-3 text-base">
+          <p className="font-bold text-primary mb-1">📝 メモの使い方</p>
+          <p className="text-sm text-muted leading-relaxed">
+            <span className="font-semibold">買い物リスト</span>や、
+            <span className="font-semibold">ちょっとしたやる事（タスク）</span>の管理に使えます。
+            <br />
+            例：牛乳・薬を飲む・電球を買う など
+          </p>
+        </section>
+
         <section className="bg-white rounded-2xl border border-border p-3">
           <div className="flex items-stretch gap-2">
             <input
