@@ -52,6 +52,14 @@ export default function BulkRegisterPage() {
 
   const save = async () => {
     if (selected.size === 0) return;
+
+    if (!patternCode) {
+      const ok = confirm(
+        `⚠ シフト種別が選ばれていません。\n\n${selected.size}日分を「時間だけ（${start}〜${end}）」で登録します。\n本当によろしいですか？\n\n後から修正する場合は1件ずつ直す必要があります。`
+      );
+      if (!ok) return;
+    }
+
     const p = SHIFT_PATTERNS.find((x) => x.code === patternCode);
     const adds = Array.from(selected).map((date) => ({
       userId: user.id,
