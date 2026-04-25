@@ -34,6 +34,7 @@ export const SHIFT_PATTERNS: ShiftPattern[] = [
   { code: "E休", label: "早番 有給", startTime: "10:00", endTime: "16:30", isLeave: true, userId: "mom" },
   { code: "物", label: "夜→物流", userId: "son" },
   { code: "C", label: "夜→コールセンター", userId: "son" },
+  { code: "リ", label: "リモート", userId: "son" },
 ];
 
 export function findPattern(code?: string): ShiftPattern | undefined {

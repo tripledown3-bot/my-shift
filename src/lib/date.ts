@@ -29,6 +29,13 @@ export function monthLabel(d: Date): string {
   return `${d.getFullYear()}年 ${d.getMonth() + 1}月`;
 }
 
+export function reiwaLabel(d: Date): string {
+  const year = d.getFullYear();
+  const reiwa = year - 2018;
+  if (reiwa < 1) return "";
+  return reiwa === 1 ? "令和元年" : `令和${reiwa}年`;
+}
+
 export function daysInMonthGrid(year: number, month: number): Date[] {
   const first = new Date(year, month, 1);
   const firstWeekday = first.getDay();

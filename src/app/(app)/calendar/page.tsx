@@ -12,10 +12,13 @@ import {
   isSameDay,
   monthLabel,
   parseYmd,
+  reiwaLabel,
   todayYmd,
   ymd,
 } from "@/lib/date";
 import {
+  addPlan as dbAddPlan,
+  addShifts as dbAddShifts,
   deletePlan as dbDeletePlan,
   deleteShift as dbDeleteShift,
   fetchPlans,
@@ -121,6 +124,44 @@ export default function CalendarPage() {
     }
   };
 
+  const addShiftFromCalendar = async (template: Shift, patch: Partial<Shift>) => {
+    try {
+      const result = await dbAddShifts([
+        {
+          userId: template.userId,
+          date: template.date,
+          patternCode: patch.patternCode,
+          startTime: patch.startTime,
+          endTime: patch.endTime,
+          note: patch.note,
+        },
+      ]);
+      setShifts((prev) => [...prev, ...result]);
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "登録に失敗しました");
+      await reload();
+    }
+  };
+
+  const addPlanFromCalendar = async (
+    template: Plan,
+    patch: Partial<Plan>
+  ) => {
+    try {
+      const created = await dbAddPlan({
+        userId: template.userId,
+        date: template.date,
+        title: patch.title ?? "",
+        startTime: patch.startTime,
+        endTime: patch.endTime,
+      });
+      setPlans((prev) => [...prev, created]);
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "登録に失敗しました");
+      await reload();
+    }
+  };
+
   const deleteShift = async (id: string) => {
     setShifts((prev) => prev.filter((s) => s.id !== id));
     try {
@@ -171,7 +212,10 @@ export default function CalendarPage() {
           >
             ←
           </button>
-          <h2 className="text-xl font-bold">{monthLabel(cursor)}</h2>
+          <div className="flex flex-col items-center leading-tight">
+            <span className="text-xl font-bold">{monthLabel(cursor)}</span>
+            <span className="text-xs text-muted">{reiwaLabel(cursor)}</span>
+          </div>
           <button
             onClick={next}
             className="px-4 py-2 rounded-full bg-white border-2 border-border text-xl font-bold"
@@ -331,6 +375,34 @@ export default function CalendarPage() {
               ✎ タップで修正・削除できます
             </p>
           )}
+
+          <div className="grid grid-cols-2 gap-2 mt-4">
+            <button
+              onClick={() =>
+                setEditingShift({
+                  id: "new",
+                  userId: user.id,
+                  date: selected,
+                })
+              }
+              className="rounded-xl py-3 border-2 border-primary text-primary text-base font-bold bg-white"
+            >
+              ＋ シフト追加
+            </button>
+            <button
+              onClick={() =>
+                setEditingPlan({
+                  id: "new",
+                  userId: user.id,
+                  date: selected,
+                  title: "",
+                })
+              }
+              className="rounded-xl py-3 border-2 border-accent text-accent text-base font-bold bg-white"
+            >
+              ＋ 予定追加
+            </button>
+          </div>
         </section>
       </main>
 
@@ -338,8 +410,12 @@ export default function CalendarPage() {
         <ShiftEditSheet
           shift={editingShift}
           ownerLabel={USERS[editingShift.userId].name}
-          onSave={(patch) => {
-            updateShift(editingShift.id, patch);
+          onSave={async (patch) => {
+            if (editingShift.id === "new") {
+              await addShiftFromCalendar(editingShift, patch);
+            } else {
+              await updateShift(editingShift.id, patch);
+            }
             setEditingShift(null);
           }}
           onDelete={() => {
@@ -353,8 +429,12 @@ export default function CalendarPage() {
       {editingPlan && (
         <PlanEditSheet
           plan={editingPlan}
-          onSave={(patch) => {
-            updatePlan(editingPlan.id, patch);
+          onSave={async (patch) => {
+            if (editingPlan.id === "new") {
+              await addPlanFromCalendar(editingPlan, patch);
+            } else {
+              await updatePlan(editingPlan.id, patch);
+            }
             setEditingPlan(null);
           }}
           onDelete={() => {

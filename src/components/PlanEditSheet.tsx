@@ -43,6 +43,7 @@ export function PlanEditSheet({ plan, onSave, onDelete, onClose }: Props) {
     onDelete();
   };
 
+  const isNew = plan.id === "new";
   const display = plan.date.replaceAll("-", "/");
 
   return (
@@ -55,7 +56,9 @@ export function PlanEditSheet({ plan, onSave, onDelete, onClose }: Props) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="w-12 h-1.5 bg-border rounded-full mx-auto mb-3" />
-        <h3 className="text-xl font-bold text-center mb-4">{display} の予定</h3>
+        <h3 className="text-xl font-bold text-center mb-4">
+          {display} の予定{isNew ? "（新規追加）" : ""}
+        </h3>
 
         <div className="mb-4">
           <label className="block font-bold mb-2">内容</label>
@@ -99,18 +102,20 @@ export function PlanEditSheet({ plan, onSave, onDelete, onClose }: Props) {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 mt-2">
-          <button
-            onClick={handleDelete}
-            className="rounded-xl py-3 border-2 border-red-300 text-red-700 text-base font-bold"
-          >
-            🗑 この予定を消す
-          </button>
+        <div className={`grid ${isNew ? "grid-cols-1" : "grid-cols-2"} gap-2 mt-2`}>
+          {!isNew && (
+            <button
+              onClick={handleDelete}
+              className="rounded-xl py-3 border-2 border-red-300 text-red-700 text-base font-bold"
+            >
+              🗑 この予定を消す
+            </button>
+          )}
           <button
             onClick={handleSave}
             className="rounded-xl py-3 bg-primary text-white text-base font-bold"
           >
-            ✓ 保存する
+            {isNew ? "✓ 登録する" : "✓ 保存する"}
           </button>
         </div>
         <button

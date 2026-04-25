@@ -60,6 +60,7 @@ export function ShiftEditSheet({
     onDelete();
   };
 
+  const isNew = shift.id === "new";
   const display = shift.date.replaceAll("-", "/");
   const currentPattern = findPattern(patternCode);
 
@@ -74,7 +75,9 @@ export function ShiftEditSheet({
       >
         <div className="w-12 h-1.5 bg-border rounded-full mx-auto mb-3" />
         <h3 className="text-xl font-bold text-center">{display}</h3>
-        <p className="text-center text-muted mb-4">{ownerLabel} のシフト</p>
+        <p className="text-center text-muted mb-4">
+          {ownerLabel} のシフト{isNew ? "（新規追加）" : ""}
+        </p>
 
         <div className="mb-4">
           <div className="font-bold mb-2">シフト種別</div>
@@ -148,18 +151,20 @@ export function ShiftEditSheet({
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-2 mt-2">
-          <button
-            onClick={handleDelete}
-            className="rounded-xl py-3 border-2 border-red-300 text-red-700 text-base font-bold"
-          >
-            🗑 このシフトを消す
-          </button>
+        <div className={`grid ${isNew ? "grid-cols-1" : "grid-cols-2"} gap-2 mt-2`}>
+          {!isNew && (
+            <button
+              onClick={handleDelete}
+              className="rounded-xl py-3 border-2 border-red-300 text-red-700 text-base font-bold"
+            >
+              🗑 このシフトを消す
+            </button>
+          )}
           <button
             onClick={handleSave}
             className="rounded-xl py-3 bg-primary text-white text-base font-bold"
           >
-            ✓ 保存する
+            {isNew ? "✓ 登録する" : "✓ 保存する"}
           </button>
         </div>
         <button
