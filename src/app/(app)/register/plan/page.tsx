@@ -7,7 +7,10 @@ import { useCurrentUser } from "@/components/UserContext";
 import { todayYmd } from "@/lib/date";
 import { addPlan } from "@/lib/db";
 
-const PRESETS = ["犬美容", "私病院", "買い物"];
+const PRESETS_BY_USER: Record<"mom" | "son", string[]> = {
+  mom: ["犬美容", "私病院", "買い物"],
+  son: ["餌", "買い物"],
+};
 
 export default function PlanRegisterPage() {
   const user = useCurrentUser();
@@ -66,7 +69,7 @@ export default function PlanRegisterPage() {
               className="w-full rounded-lg border border-border px-3 bg-white"
             />
             <div className="flex flex-wrap gap-2 mt-3">
-              {PRESETS.map((p) => (
+              {PRESETS_BY_USER[user.id].map((p) => (
                 <button
                   key={p}
                   onClick={() => setTitle(p)}

@@ -82,6 +82,12 @@ export default function CalendarPage() {
       arr.push(s);
       map.set(s.date, arr);
     }
+    for (const arr of map.values()) {
+      arr.sort((a, b) => {
+        if (a.userId === b.userId) return 0;
+        return a.userId === "mom" ? -1 : 1;
+      });
+    }
     return map;
   }, [shifts]);
 
@@ -238,11 +244,15 @@ export default function CalendarPage() {
                         </span>
                       );
                     })}
-                    {dayPlans.length > 0 && (
-                      <span className="text-xs leading-tight rounded px-1 py-[1px] bg-accent/20 text-accent font-bold text-center truncate">
-                        ★
-                      </span>
-                    )}
+                    {dayPlans.length > 0 && (() => {
+                      const hasFeed = dayPlans.some((p) => p.title === "餌");
+                      const hasOther = dayPlans.some((p) => p.title !== "餌");
+                      return (
+                        <span className="text-xs leading-tight rounded px-1 py-[1px] bg-accent/20 text-accent font-bold text-center truncate">
+                          {hasFeed && hasOther ? "●★" : hasFeed ? "●" : "★"}
+                        </span>
+                      );
+                    })()}
                   </div>
                 </button>
               );

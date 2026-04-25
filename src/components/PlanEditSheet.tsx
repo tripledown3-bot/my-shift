@@ -3,7 +3,10 @@
 import { useEffect, useState } from "react";
 import type { Plan } from "@/lib/types";
 
-const PRESETS = ["犬美容", "私病院", "買い物"];
+const PRESETS_BY_USER: Record<"mom" | "son", string[]> = {
+  mom: ["犬美容", "私病院", "買い物"],
+  son: ["餌", "買い物"],
+};
 
 type Props = {
   plan: Plan;
@@ -63,7 +66,7 @@ export function PlanEditSheet({ plan, onSave, onDelete, onClose }: Props) {
             className="w-full rounded-lg border border-border px-3 bg-white"
           />
           <div className="flex flex-wrap gap-2 mt-2">
-            {PRESETS.map((p) => (
+            {PRESETS_BY_USER[plan.userId].map((p) => (
               <button
                 key={p}
                 onClick={() => setTitle(p)}
