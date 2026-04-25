@@ -137,14 +137,20 @@ export default function MemoPage() {
                 </p>
               ) : (
                 <ul className="bg-white rounded-2xl border border-border divide-y divide-border overflow-hidden">
-                  {remaining.map((m) => (
+                  {remaining.map((m) => {
+                    const isSpecial = m.text === "餌";
+                    return (
                     <li
                       key={m.id}
                       className="flex items-center gap-2 pl-2 pr-2"
                     >
                       <button
                         onClick={() => toggle(m.id)}
-                        className="w-11 h-11 rounded-full border-2 border-primary flex items-center justify-center shrink-0 compact"
+                        className={`w-11 h-11 rounded-full flex items-center justify-center shrink-0 compact ${
+                          isSpecial
+                            ? "bg-primary border-2 border-primary"
+                            : "border-2 border-primary"
+                        }`}
                         aria-label="完了にする"
                       >
                         <span className="sr-only">未完了</span>
@@ -160,7 +166,8 @@ export default function MemoPage() {
                         ✕
                       </button>
                     </li>
-                  ))}
+                  );
+                  })}
                 </ul>
               )}
             </section>
