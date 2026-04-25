@@ -13,9 +13,11 @@ import {
   monthLabel,
   parseYmd,
   reiwaLabel,
+  todayFullLabel,
   todayYmd,
   ymd,
 } from "@/lib/date";
+import { useWeatherToday } from "@/lib/weather";
 import {
   addPlan as dbAddPlan,
   addShifts as dbAddShifts,
@@ -45,6 +47,7 @@ export default function CalendarPage() {
   const [selected, setSelected] = useState<string>(todayYmd());
   const [editingShift, setEditingShift] = useState<Shift | null>(null);
   const [editingPlan, setEditingPlan] = useState<Plan | null>(null);
+  const { weather } = useWeatherToday();
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const detailsRef = useRef<HTMLElement | null>(null);
@@ -196,6 +199,23 @@ export default function CalendarPage() {
     <>
       <AppHeader title="カレンダー" user={user} />
       <main className="flex-1 max-w-md w-full mx-auto px-3 py-4">
+        <section className="mb-3 bg-white rounded-2xl border border-border p-3 flex items-center gap-3">
+          <div className="flex-1 min-w-0">
+            <p className="text-base font-bold leading-tight">
+              {todayFullLabel()}
+            </p>
+            {weather && (
+              <p className="text-sm text-muted mt-1 leading-tight">
+                福岡 {weather.emoji} {weather.label}　降水
+                <span className="font-bold text-foreground">
+                  {weather.precipProb}%
+                </span>
+                　{Math.round(weather.tempMin)}°/{Math.round(weather.tempMax)}°
+              </p>
+            )}
+          </div>
+        </section>
+
         {loading && (
           <p className="text-center text-muted py-2">読み込み中…</p>
         )}

@@ -36,6 +36,11 @@ export function reiwaLabel(d: Date): string {
   return reiwa === 1 ? "令和元年" : `令和${reiwa}年`;
 }
 
+export function todayFullLabel(d: Date = new Date()): string {
+  const r = reiwaLabel(d);
+  return `本日: ${r}${d.getMonth() + 1}月${d.getDate()}日(${WEEKDAY_JA[d.getDay()]})`;
+}
+
 export function daysInMonthGrid(year: number, month: number): Date[] {
   const first = new Date(year, month, 1);
   const firstWeekday = first.getDay();
