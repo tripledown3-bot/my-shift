@@ -38,14 +38,12 @@ import {
 
 function WeatherRow({ label, day }: { label: string; day: WeatherDay }) {
   return (
-    <div className="rounded-xl bg-background/60 border border-border px-2 py-1.5">
-      <div className="flex items-center gap-1 leading-tight">
-        <span className="font-bold text-muted text-xs">{label}</span>
-        <span className="text-lg">{day.emoji}</span>
-        <span className="text-xs">{day.label}</span>
-      </div>
-      <div className="text-xs leading-tight mt-0.5 flex items-center flex-wrap gap-x-2">
-        <span>
+    <div className="flex items-center gap-2 text-sm leading-tight">
+      <span className="font-bold text-muted w-8 shrink-0">{label}</span>
+      <span className="text-lg shrink-0">{day.emoji}</span>
+      <span className="text-xs text-muted shrink-0 truncate">{day.label}</span>
+      <span className="ml-auto flex items-center gap-2 shrink-0">
+        <span className="text-xs">
           降水 <span className="font-bold">{day.precipProb}%</span>
         </span>
         <span>
@@ -57,7 +55,7 @@ function WeatherRow({ label, day }: { label: string; day: WeatherDay }) {
             {Math.round(day.tempMax)}°
           </span>
         </span>
-      </div>
+      </span>
     </div>
   );
 }
@@ -230,7 +228,7 @@ export default function CalendarPage() {
             {todayFullLabel()}
           </p>
           {forecast && (
-            <div className="grid grid-cols-2 gap-2 text-sm">
+            <div className="space-y-1">
               <WeatherRow label="今日" day={forecast.today} />
               <WeatherRow label="明日" day={forecast.tomorrow} />
             </div>
