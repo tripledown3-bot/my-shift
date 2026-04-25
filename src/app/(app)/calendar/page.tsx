@@ -17,7 +17,7 @@ import {
   todayYmd,
   ymd,
 } from "@/lib/date";
-import { useWeatherToday } from "@/lib/weather";
+import { useWeatherForecast, type WeatherDay } from "@/lib/weather";
 import {
   addPlan as dbAddPlan,
   addShifts as dbAddShifts,
@@ -36,6 +36,32 @@ import {
   type Shift,
 } from "@/lib/types";
 
+function WeatherRow({ label, day }: { label: string; day: WeatherDay }) {
+  return (
+    <div className="rounded-xl bg-background/60 border border-border px-2 py-1.5">
+      <div className="flex items-center gap-1 leading-tight">
+        <span className="font-bold text-muted text-xs">{label}</span>
+        <span className="text-lg">{day.emoji}</span>
+        <span className="text-xs">{day.label}</span>
+      </div>
+      <div className="text-xs leading-tight mt-0.5 flex items-center flex-wrap gap-x-2">
+        <span>
+          降水 <span className="font-bold">{day.precipProb}%</span>
+        </span>
+        <span>
+          <span className="text-blue-600 font-bold">
+            {Math.round(day.tempMin)}°
+          </span>
+          <span className="text-muted mx-0.5">／</span>
+          <span className="text-red-600 font-bold">
+            {Math.round(day.tempMax)}°
+          </span>
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export default function CalendarPage() {
   const user = useCurrentUser();
   const today = useMemo(() => new Date(), []);
@@ -47,7 +73,7 @@ export default function CalendarPage() {
   const [selected, setSelected] = useState<string>(todayYmd());
   const [editingShift, setEditingShift] = useState<Shift | null>(null);
   const [editingPlan, setEditingPlan] = useState<Plan | null>(null);
-  const { weather } = useWeatherToday();
+  const { forecast } = useWeatherForecast();
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const detailsRef = useRef<HTMLElement | null>(null);
@@ -199,21 +225,16 @@ export default function CalendarPage() {
     <>
       <AppHeader title="カレンダー" user={user} />
       <main className="flex-1 max-w-md w-full mx-auto px-3 py-4">
-        <section className="mb-3 bg-white rounded-2xl border border-border p-3 flex items-center gap-3">
-          <div className="flex-1 min-w-0">
-            <p className="text-base font-bold leading-tight">
-              {todayFullLabel()}
-            </p>
-            {weather && (
-              <p className="text-sm text-muted mt-1 leading-tight">
-                福岡 {weather.emoji} {weather.label}　降水
-                <span className="font-bold text-foreground">
-                  {weather.precipProb}%
-                </span>
-                　{Math.round(weather.tempMin)}°/{Math.round(weather.tempMax)}°
-              </p>
-            )}
-          </div>
+        <section className="mb-3 bg-white rounded-2xl border border-border p-3">
+          <p className="text-base font-bold leading-tight mb-2">
+            {todayFullLabel()}
+          </p>
+          {forecast && (
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              <WeatherRow label="今日" day={forecast.today} />
+              <WeatherRow label="明日" day={forecast.tomorrow} />
+            </div>
+          )}
         </section>
 
         {loading && (

@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 const LAT = 33.5904;
 const LON = 130.4017;
 
-export type WeatherToday = {
+export type WeatherDay = {
   date: string;
   weatherCode: number;
   tempMax: number;
@@ -16,7 +16,12 @@ export type WeatherToday = {
   label: string;
 };
 
-const CACHE_KEY = "my-shift:weather-cache";
+export type WeatherForecast = {
+  today: WeatherDay;
+  tomorrow: WeatherDay;
+};
+
+const CACHE_KEY = "my-shift:weather-cache-v2";
 const CACHE_TTL_MS = 60 * 60 * 1000; // 1時間
 
 function emojiFromCode(code: number): { emoji: string; label: string } {
@@ -34,28 +39,52 @@ function emojiFromCode(code: number): { emoji: string; label: string } {
   return { emoji: "🌤️", label: "" };
 }
 
-export function useWeatherToday(): {
-  weather: WeatherToday | null;
+function buildDay(
+  data: {
+    daily: {
+      time: string[];
+      weather_code: number[];
+      temperature_2m_max: number[];
+      temperature_2m_min: number[];
+      precipitation_probability_max: number[];
+    };
+  },
+  i: number
+): WeatherDay {
+  const code = data.daily.weather_code[i];
+  const { emoji, label } = emojiFromCode(code);
+  return {
+    date: data.daily.time[i],
+    weatherCode: code,
+    tempMax: data.daily.temperature_2m_max[i],
+    tempMin: data.daily.temperature_2m_min[i],
+    precipProb: data.daily.precipitation_probability_max[i] ?? 0,
+    emoji,
+    label,
+  };
+}
+
+export function useWeatherForecast(): {
+  forecast: WeatherForecast | null;
   loading: boolean;
   error: string | null;
 } {
-  const [weather, setWeather] = useState<WeatherToday | null>(null);
+  const [forecast, setForecast] = useState<WeatherForecast | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchWeather = async () => {
       try {
-        // キャッシュ確認
         if (typeof window !== "undefined") {
           const cached = localStorage.getItem(CACHE_KEY);
           if (cached) {
             const data = JSON.parse(cached) as {
               ts: number;
-              weather: WeatherToday;
+              forecast: WeatherForecast;
             };
             if (Date.now() - data.ts < CACHE_TTL_MS) {
-              setWeather(data.weather);
+              setForecast(data.forecast);
               setLoading(false);
               return;
             }
@@ -63,30 +92,21 @@ export function useWeatherToday(): {
         }
 
         const res = await fetch(
-          `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FTokyo&forecast_days=1`
+          `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FTokyo&forecast_days=2`
         );
         if (!res.ok) throw new Error("天気取得失敗");
         const data = await res.json();
 
-        const code = data.daily.weather_code[0] as number;
-        const { emoji, label } = emojiFromCode(code);
-
-        const result: WeatherToday = {
-          date: data.daily.time[0] as string,
-          weatherCode: code,
-          tempMax: data.daily.temperature_2m_max[0] as number,
-          tempMin: data.daily.temperature_2m_min[0] as number,
-          precipProb:
-            (data.daily.precipitation_probability_max[0] as number) ?? 0,
-          emoji,
-          label,
+        const result: WeatherForecast = {
+          today: buildDay(data, 0),
+          tomorrow: buildDay(data, 1),
         };
 
-        setWeather(result);
+        setForecast(result);
         if (typeof window !== "undefined") {
           localStorage.setItem(
             CACHE_KEY,
-            JSON.stringify({ ts: Date.now(), weather: result })
+            JSON.stringify({ ts: Date.now(), forecast: result })
           );
         }
       } catch (e) {
@@ -99,5 +119,5 @@ export function useWeatherToday(): {
     fetchWeather();
   }, []);
 
-  return { weather, loading, error };
+  return { forecast, loading, error };
 }
