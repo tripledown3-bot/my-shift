@@ -315,7 +315,8 @@ export default function PhotoRegisterPage() {
                   <button
                     key={i}
                     onClick={() => setEditingDate(key)}
-                    className={`aspect-square rounded-xl text-left p-1 flex flex-col border-2 transition ${
+                    style={{ minHeight: 0 }}
+                    className={`aspect-square min-w-0 rounded-xl text-left p-1 flex flex-col border-2 transition ${
                       draft
                         ? "bg-white border-primary"
                         : inMonth

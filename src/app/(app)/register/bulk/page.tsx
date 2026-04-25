@@ -196,7 +196,8 @@ export default function BulkRegisterPage() {
                 <button
                   key={i}
                   onClick={() => toggle(key)}
-                  className={`aspect-square rounded-xl text-lg font-bold transition border-2 ${
+                  style={{ minHeight: 0 }}
+                  className={`aspect-square min-w-0 rounded-xl text-base font-bold transition border-2 flex items-center justify-center ${
                     isSelected
                       ? "bg-primary text-white border-primary"
                       : inMonth
