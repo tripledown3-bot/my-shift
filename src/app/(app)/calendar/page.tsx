@@ -254,7 +254,7 @@ export default function CalendarPage() {
                 <button
                   key={i}
                   onClick={() => selectDate(key)}
-                  className={`min-h-[104px] border-b border-r border-border last:border-r-0 text-left p-1 flex flex-col items-stretch transition ${
+                  className={`min-h-[124px] border-b border-r border-border last:border-r-0 text-left p-1 flex flex-col items-stretch transition ${
                     inMonth ? "bg-white" : "bg-background/40"
                   } ${isSelected ? "ring-4 ring-primary ring-inset" : ""}`}
                   title={holiday ?? undefined}
@@ -273,7 +273,7 @@ export default function CalendarPage() {
                     {d.getDate()}
                   </span>
                   <div className="flex flex-col gap-[2px] mt-1">
-                    {dayShifts.slice(0, 2).map((s) => {
+                    {dayShifts.slice(0, 3).map((s) => {
                       const p = findPattern(s.patternCode);
                       const short = p
                         ? p.code
