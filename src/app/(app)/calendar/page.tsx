@@ -29,6 +29,7 @@ import {
   updateShift as dbUpdateShift,
 } from "@/lib/db";
 import {
+  SHIFT_PATTERNS,
   USERS,
   describeShift,
   findPattern,
@@ -112,10 +113,17 @@ export default function CalendarPage() {
       arr.push(s);
       map.set(s.date, arr);
     }
+    const patternOrder = new Map(
+      SHIFT_PATTERNS.map((p, i) => [p.code, i])
+    );
     for (const arr of map.values()) {
       arr.sort((a, b) => {
-        if (a.userId === b.userId) return 0;
-        return a.userId === "mom" ? -1 : 1;
+        if (a.userId !== b.userId) {
+          return a.userId === "mom" ? -1 : 1;
+        }
+        const ai = patternOrder.get(a.patternCode ?? "") ?? 999;
+        const bi = patternOrder.get(b.patternCode ?? "") ?? 999;
+        return ai - bi;
       });
     }
     return map;
