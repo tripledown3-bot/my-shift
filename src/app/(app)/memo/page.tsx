@@ -104,18 +104,19 @@ export default function MemoPage() {
           </p>
         )}
         <section className="bg-white rounded-2xl border border-border p-3">
-          <div className="flex items-center gap-2">
+          <div className="flex items-stretch gap-2">
             <input
               type="text"
               value={text}
               onChange={(e) => setText(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && add()}
               placeholder="例：牛乳"
-              className="flex-1 rounded-xl border-2 border-border px-3 bg-white"
+              className="flex-1 min-w-0 rounded-xl border-2 border-border px-3 bg-white"
             />
             <button
               onClick={add}
-              className="rounded-xl bg-primary text-white px-5 text-base font-bold"
+              className="rounded-xl bg-primary text-white px-4 text-base font-bold shrink-0 whitespace-nowrap"
+              style={{ minHeight: 56 }}
               aria-label="追加"
             >
               ＋追加
