@@ -177,7 +177,7 @@ export default function CalendarPage() {
             {WEEKDAY_JA.map((w, i) => (
               <div
                 key={w}
-                className={`text-center py-1.5 text-sm font-bold ${
+                className={`text-center py-2 text-base font-bold ${
                   i === 0 ? "text-red-600" : i === 6 ? "text-blue-600" : ""
                 }`}
               >
@@ -199,14 +199,14 @@ export default function CalendarPage() {
                 <button
                   key={i}
                   onClick={() => selectDate(key)}
-                  className={`min-h-[64px] border-b border-r border-border last:border-r-0 text-left p-0.5 flex flex-col items-stretch transition ${
+                  className={`min-h-[80px] border-b border-r border-border last:border-r-0 text-left p-1 flex flex-col items-stretch transition ${
                     inMonth ? "bg-white" : "bg-background/40"
                   } ${isSelected ? "ring-4 ring-primary ring-inset" : ""}`}
                 >
                   <span
-                    className={`text-sm font-bold leading-none px-1 pt-0.5 ${
+                    className={`text-base font-bold leading-none ${
                       isToday
-                        ? "bg-primary text-white rounded-full w-6 h-6 mx-auto flex items-center justify-center text-xs"
+                        ? "bg-primary text-white rounded-full w-7 h-7 mx-auto flex items-center justify-center"
                         : weekday === 0
                         ? "text-red-600"
                         : weekday === 6
@@ -216,7 +216,7 @@ export default function CalendarPage() {
                   >
                     {d.getDate()}
                   </span>
-                  <div className="flex flex-col gap-[1px] mt-0.5">
+                  <div className="flex flex-col gap-[2px] mt-1">
                     {dayShifts.slice(0, 2).map((s) => {
                       const p = findPattern(s.patternCode);
                       const short = p
@@ -225,7 +225,7 @@ export default function CalendarPage() {
                       return (
                         <span
                           key={s.id}
-                          className="text-[11px] leading-[1.2] rounded px-0.5 text-white font-bold text-center truncate"
+                          className="text-xs leading-tight rounded px-1 py-[1px] text-white font-bold text-center truncate"
                           style={{ backgroundColor: USERS[s.userId].color }}
                         >
                           {short}
@@ -233,7 +233,7 @@ export default function CalendarPage() {
                       );
                     })}
                     {dayPlans.length > 0 && (
-                      <span className="text-[10px] leading-[1.2] rounded px-0.5 bg-accent/20 text-accent font-bold text-center truncate">
+                      <span className="text-xs leading-tight rounded px-1 py-[1px] bg-accent/20 text-accent font-bold text-center truncate">
                         ★
                       </span>
                     )}
