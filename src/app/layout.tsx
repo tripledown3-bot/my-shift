@@ -2,8 +2,17 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "my-shift | 家族のシフト",
+  title: "家族のシフト",
   description: "母と息子のシフトをやさしく管理するアプリ",
+  applicationName: "家族のシフト",
+  appleWebApp: {
+    capable: true,
+    title: "家族シフト",
+    statusBarStyle: "default",
+  },
+  formatDetection: {
+    telephone: false,
+  },
 };
 
 export const viewport: Viewport = {

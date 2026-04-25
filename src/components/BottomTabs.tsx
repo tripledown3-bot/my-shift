@@ -22,12 +22,12 @@ export function BottomTabs() {
               <Link
                 href={t.href}
                 aria-current={active ? "page" : undefined}
-                className={`flex flex-col items-center justify-center py-3 min-h-[76px] font-semibold active:bg-primary/10 transition ${
+                className={`flex flex-col items-center justify-center py-1.5 min-h-[60px] font-semibold active:bg-primary/10 transition ${
                   active ? "text-primary" : "text-muted"
                 }`}
               >
-                <span className="text-3xl leading-none mb-1">{t.icon}</span>
-                <span className="text-base">{t.label}</span>
+                <span className="text-2xl leading-none mb-0.5">{t.icon}</span>
+                <span className="text-sm">{t.label}</span>
               </Link>
             </li>
           );

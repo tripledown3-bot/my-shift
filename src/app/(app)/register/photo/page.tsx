@@ -375,7 +375,7 @@ export default function PhotoRegisterPage() {
       </main>
 
       {drafts.length > 0 && (
-        <div className="fixed bottom-[88px] inset-x-0 z-10 px-3">
+        <div className="fixed bottom-[68px] inset-x-0 z-10 px-3">
           <div className="max-w-md mx-auto">
             <button
               onClick={save}

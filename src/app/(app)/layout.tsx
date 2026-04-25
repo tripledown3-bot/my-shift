@@ -33,7 +33,7 @@ export default function AppLayout({
   }
 
   return (
-    <div className="flex-1 flex flex-col pb-28">
+    <div className="flex-1 flex flex-col pb-20">
       <UserProvider user={user}>{children}</UserProvider>
       <BottomTabs />
     </div>
