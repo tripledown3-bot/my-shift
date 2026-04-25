@@ -20,6 +20,7 @@ export type Shift = {
 export type ShiftPattern = {
   code: string;
   label: string;
+  shortLabel?: string;
   startTime?: string;
   endTime?: string;
   isLeave?: boolean;
@@ -32,9 +33,9 @@ export const SHIFT_PATTERNS: ShiftPattern[] = [
   { code: "F", label: "中番 勤務", startTime: "15:30", endTime: "23:30", userId: "mom" },
   { code: "B", label: "遅番 勤務", startTime: "17:00", endTime: "23:30", userId: "mom" },
   { code: "E休", label: "早番 有給", startTime: "10:00", endTime: "16:30", isLeave: true, userId: "mom" },
-  { code: "物", label: "夜→物流", userId: "son" },
-  { code: "C", label: "夜→コールセンター", userId: "son" },
-  { code: "リ", label: "リモート", userId: "son" },
+  { code: "物", label: "夜→物流", shortLabel: "物流", userId: "son" },
+  { code: "C", label: "夜→コールセンター", shortLabel: "CS", userId: "son" },
+  { code: "リ", label: "リモート", shortLabel: "リモ", userId: "son" },
 ];
 
 export function findPattern(code?: string): ShiftPattern | undefined {

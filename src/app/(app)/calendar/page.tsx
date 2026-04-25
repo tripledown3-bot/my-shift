@@ -323,7 +323,7 @@ export default function CalendarPage() {
                     {dayShifts.slice(0, 3).map((s) => {
                       const p = findPattern(s.patternCode);
                       const short = p
-                        ? p.code
+                        ? p.shortLabel ?? p.code
                         : s.startTime?.slice(0, 5) ?? "";
                       return (
                         <span
