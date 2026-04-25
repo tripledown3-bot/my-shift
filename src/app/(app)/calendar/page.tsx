@@ -254,7 +254,7 @@ export default function CalendarPage() {
                 <button
                   key={i}
                   onClick={() => selectDate(key)}
-                  className={`min-h-[80px] border-b border-r border-border last:border-r-0 text-left p-1 flex flex-col items-stretch transition ${
+                  className={`min-h-[104px] border-b border-r border-border last:border-r-0 text-left p-1 flex flex-col items-stretch transition ${
                     inMonth ? "bg-white" : "bg-background/40"
                   } ${isSelected ? "ring-4 ring-primary ring-inset" : ""}`}
                   title={holiday ?? undefined}
