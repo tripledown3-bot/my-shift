@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
 import { useCurrentUser } from "@/components/UserContext";
-import { clearAll, setCurrentUser } from "@/lib/storage";
+import { setCurrentUser } from "@/lib/storage";
 import { getPatternsForUser } from "@/lib/types";
 
 export default function SettingsPage() {
@@ -12,18 +12,6 @@ export default function SettingsPage() {
 
   const switchUser = () => {
     setCurrentUser(null);
-    router.push("/");
-  };
-
-  const resetAll = () => {
-    if (
-      !confirm(
-        "すべての登録データ（シフト・予定・メモ）を消します。\nよろしいですか？"
-      )
-    )
-      return;
-    clearAll();
-    alert("リセットしました");
     router.push("/");
   };
 
@@ -77,34 +65,22 @@ export default function SettingsPage() {
           <dl className="space-y-2 text-base">
             <div className="flex justify-between">
               <dt className="text-muted">バージョン</dt>
-              <dd>0.1.0（雛形）</dd>
+              <dd>1.0.0</dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-muted">データ保存先</dt>
-              <dd>端末内（localStorage）</dd>
+              <dd>Supabase（クラウド）</dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-muted">OCR</dt>
-              <dd>ダミー動作</dd>
+              <dd>Gemini API</dd>
             </div>
           </dl>
           <p className="text-sm text-muted mt-3 leading-relaxed">
-            ※ これは見た目確認用のひな型です。<br />
-            本番版ではSupabaseに保存・Gemini APIで画像読みとりを行います。
+            データはクラウドに保存されるので、スマホを変えても消えません。
+            <br />
+            2人の端末で自動的に同期されます。
           </p>
-        </section>
-
-        <section className="bg-white rounded-2xl border-2 border-red-200 p-5">
-          <h3 className="font-bold text-lg mb-3 text-red-700">データのリセット</h3>
-          <p className="text-base text-muted mb-3">
-            動作確認用にすべてのデータを消せます。
-          </p>
-          <button
-            onClick={resetAll}
-            className="w-full rounded-2xl bg-red-600 text-white text-lg font-bold py-3"
-          >
-            🗑 ぜんぶ消す
-          </button>
         </section>
       </main>
     </>

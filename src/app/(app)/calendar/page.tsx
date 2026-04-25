@@ -14,11 +14,13 @@ import {
   ymd,
 } from "@/lib/date";
 import {
-  getPlans,
-  getShifts,
-  savePlans,
-  saveShifts,
-} from "@/lib/storage";
+  deletePlan as dbDeletePlan,
+  deleteShift as dbDeleteShift,
+  fetchPlans,
+  fetchShifts,
+  updatePlan as dbUpdatePlan,
+  updateShift as dbUpdateShift,
+} from "@/lib/db";
 import {
   USERS,
   describeShift,
@@ -38,12 +40,29 @@ export default function CalendarPage() {
   const [selected, setSelected] = useState<string>(todayYmd());
   const [editingShift, setEditingShift] = useState<Shift | null>(null);
   const [editingPlan, setEditingPlan] = useState<Plan | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const detailsRef = useRef<HTMLElement | null>(null);
 
+  const reload = async () => {
+    try {
+      const [s, p] = await Promise.all([fetchShifts(), fetchPlans(user.id)]);
+      setShifts(s);
+      setPlans(p);
+      setErrorMsg(null);
+    } catch (e) {
+      setErrorMsg(
+        e instanceof Error ? e.message : "データ取得に失敗しました"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    setShifts(getShifts());
-    setPlans(getPlans());
-  }, []);
+    reload();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user.id]);
 
   const selectDate = (key: string) => {
     setSelected(key);
@@ -83,34 +102,58 @@ export default function CalendarPage() {
   const next = () =>
     setCursor(new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1));
 
-  const updateShift = (id: string, patch: Partial<Shift>) => {
-    const next = shifts.map((s) => (s.id === id ? { ...s, ...patch } : s));
-    setShifts(next);
-    saveShifts(next);
+  const updateShift = async (id: string, patch: Partial<Shift>) => {
+    setShifts((prev) => prev.map((s) => (s.id === id ? { ...s, ...patch } : s)));
+    try {
+      await dbUpdateShift(id, patch);
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "更新に失敗しました");
+      await reload();
+    }
   };
 
-  const deleteShift = (id: string) => {
-    const next = shifts.filter((s) => s.id !== id);
-    setShifts(next);
-    saveShifts(next);
+  const deleteShift = async (id: string) => {
+    setShifts((prev) => prev.filter((s) => s.id !== id));
+    try {
+      await dbDeleteShift(id);
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "削除に失敗しました");
+      await reload();
+    }
   };
 
-  const updatePlan = (id: string, patch: Partial<Plan>) => {
-    const next = plans.map((p) => (p.id === id ? { ...p, ...patch } : p));
-    setPlans(next);
-    savePlans(next);
+  const updatePlan = async (id: string, patch: Partial<Plan>) => {
+    setPlans((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p)));
+    try {
+      await dbUpdatePlan(id, patch);
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "更新に失敗しました");
+      await reload();
+    }
   };
 
-  const deletePlan = (id: string) => {
-    const next = plans.filter((p) => p.id !== id);
-    setPlans(next);
-    savePlans(next);
+  const deletePlan = async (id: string) => {
+    setPlans((prev) => prev.filter((p) => p.id !== id));
+    try {
+      await dbDeletePlan(id);
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "削除に失敗しました");
+      await reload();
+    }
   };
 
   return (
     <>
       <AppHeader title="カレンダー" user={user} />
       <main className="flex-1 max-w-md w-full mx-auto px-3 py-4">
+        {loading && (
+          <p className="text-center text-muted py-2">読み込み中…</p>
+        )}
+        {errorMsg && (
+          <p className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 mb-3">
+            ⚠ {errorMsg}
+          </p>
+        )}
         <div className="flex items-center justify-between mb-3 px-1">
           <button
             onClick={prev}

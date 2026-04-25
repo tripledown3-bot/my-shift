@@ -3,65 +3,106 @@
 import { useEffect, useState } from "react";
 import { AppHeader } from "@/components/AppHeader";
 import { useCurrentUser } from "@/components/UserContext";
-import { getMemos, saveMemos, uid } from "@/lib/storage";
+import {
+  addMemo,
+  deleteDoneMemos,
+  deleteMemo,
+  fetchMemos,
+  updateMemo,
+} from "@/lib/db";
 import type { Memo } from "@/lib/types";
 
 export default function MemoPage() {
   const user = useCurrentUser();
   const [memos, setMemos] = useState<Memo[]>([]);
   const [text, setText] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const reload = async () => {
+    try {
+      const data = await fetchMemos(user.id);
+      setMemos(data);
+      setErrorMsg(null);
+    } catch (e) {
+      setErrorMsg(e instanceof Error ? e.message : "読み込みに失敗しました");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    setMemos(getMemos());
-  }, []);
+    reload();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user.id]);
 
-  const mine = memos.filter((m) => m.userId === user.id);
-  const remaining = mine.filter((m) => !m.done);
-  const done = mine.filter((m) => m.done);
+  const remaining = memos.filter((m) => !m.done);
+  const done = memos.filter((m) => m.done);
 
-  const add = () => {
+  const add = async () => {
     const v = text.trim();
     if (!v) return;
-    const next: Memo[] = [
-      ...memos,
-      {
-        id: uid(),
+    setText("");
+    try {
+      const created = await addMemo({
         userId: user.id,
         text: v,
         done: false,
-        createdAt: new Date().toISOString(),
-      },
-    ];
-    setMemos(next);
-    saveMemos(next);
-    setText("");
+      });
+      setMemos((prev) => [...prev, created]);
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "追加に失敗しました");
+      setText(v);
+    }
   };
 
-  const toggle = (id: string) => {
-    const next = memos.map((m) => (m.id === id ? { ...m, done: !m.done } : m));
-    setMemos(next);
-    saveMemos(next);
+  const toggle = async (id: string) => {
+    const target = memos.find((m) => m.id === id);
+    if (!target) return;
+    const newDone = !target.done;
+    setMemos((prev) =>
+      prev.map((m) => (m.id === id ? { ...m, done: newDone } : m))
+    );
+    try {
+      await updateMemo(id, { done: newDone });
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "更新に失敗しました");
+      await reload();
+    }
   };
 
-  const remove = (id: string) => {
+  const remove = async (id: string) => {
     if (!confirm("このメモを消しますか？")) return;
-    const next = memos.filter((m) => m.id !== id);
-    setMemos(next);
-    saveMemos(next);
+    setMemos((prev) => prev.filter((m) => m.id !== id));
+    try {
+      await deleteMemo(id);
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "削除に失敗しました");
+      await reload();
+    }
   };
 
-  const clearDone = () => {
+  const clearDone = async () => {
     if (done.length === 0) return;
     if (!confirm(`完了した${done.length}件を消しますか？`)) return;
-    const next = memos.filter((m) => !(m.userId === user.id && m.done));
-    setMemos(next);
-    saveMemos(next);
+    setMemos((prev) => prev.filter((m) => !m.done));
+    try {
+      await deleteDoneMemos(user.id);
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "削除に失敗しました");
+      await reload();
+    }
   };
 
   return (
     <>
       <AppHeader title="メモ" user={user} />
       <main className="flex-1 max-w-md w-full mx-auto px-4 py-4 space-y-4">
+        {errorMsg && (
+          <p className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3">
+            ⚠ {errorMsg}
+          </p>
+        )}
         <section className="bg-white rounded-2xl border border-border p-3">
           <div className="flex items-center gap-2">
             <input
@@ -82,84 +123,90 @@ export default function MemoPage() {
           </div>
         </section>
 
-        <section>
-          <h3 className="font-bold text-base mb-2 px-1">
-            のこり（{remaining.length}件）
-          </h3>
-          {remaining.length === 0 ? (
-            <p className="text-muted text-center py-4 bg-white rounded-xl border border-border text-base">
-              メモはありません
-            </p>
-          ) : (
-            <ul className="bg-white rounded-2xl border border-border divide-y divide-border overflow-hidden">
-              {remaining.map((m) => (
-                <li
-                  key={m.id}
-                  className="flex items-center gap-2 pl-2 pr-2"
-                >
-                  <button
-                    onClick={() => toggle(m.id)}
-                    className="w-11 h-11 rounded-full border-2 border-primary flex items-center justify-center shrink-0 compact"
-                    aria-label="完了にする"
-                  >
-                    <span className="sr-only">未完了</span>
-                  </button>
-                  <span className="flex-1 text-base py-3 break-words">
-                    {m.text}
-                  </span>
-                  <button
-                    onClick={() => remove(m.id)}
-                    className="w-11 h-11 rounded-full bg-red-50 text-red-600 flex items-center justify-center shrink-0 text-xl font-bold compact"
-                    aria-label="削除"
-                  >
-                    ✕
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-
-        {done.length > 0 && (
-          <section>
-            <div className="flex items-center justify-between mb-2 px-1">
-              <h3 className="font-bold text-base">
-                完了（{done.length}件）
+        {loading ? (
+          <p className="text-center text-muted py-6">読み込み中…</p>
+        ) : (
+          <>
+            <section>
+              <h3 className="font-bold text-base mb-2 px-1">
+                のこり（{remaining.length}件）
               </h3>
-              <button
-                onClick={clearDone}
-                className="text-sm text-red-600 font-semibold compact px-3 py-1"
-              >
-                まとめて消す
-              </button>
-            </div>
-            <ul className="bg-background rounded-2xl border border-border divide-y divide-border overflow-hidden opacity-75">
-              {done.map((m) => (
-                <li
-                  key={m.id}
-                  className="flex items-center gap-2 pl-2 pr-2"
-                >
+              {remaining.length === 0 ? (
+                <p className="text-muted text-center py-4 bg-white rounded-xl border border-border text-base">
+                  メモはありません
+                </p>
+              ) : (
+                <ul className="bg-white rounded-2xl border border-border divide-y divide-border overflow-hidden">
+                  {remaining.map((m) => (
+                    <li
+                      key={m.id}
+                      className="flex items-center gap-2 pl-2 pr-2"
+                    >
+                      <button
+                        onClick={() => toggle(m.id)}
+                        className="w-11 h-11 rounded-full border-2 border-primary flex items-center justify-center shrink-0 compact"
+                        aria-label="完了にする"
+                      >
+                        <span className="sr-only">未完了</span>
+                      </button>
+                      <span className="flex-1 text-base py-3 break-words">
+                        {m.text}
+                      </span>
+                      <button
+                        onClick={() => remove(m.id)}
+                        className="w-11 h-11 rounded-full bg-red-50 text-red-600 flex items-center justify-center shrink-0 text-xl font-bold compact"
+                        aria-label="削除"
+                      >
+                        ✕
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+
+            {done.length > 0 && (
+              <section>
+                <div className="flex items-center justify-between mb-2 px-1">
+                  <h3 className="font-bold text-base">
+                    完了（{done.length}件）
+                  </h3>
                   <button
-                    onClick={() => toggle(m.id)}
-                    className="w-11 h-11 rounded-full bg-primary border-2 border-primary flex items-center justify-center text-xl text-white shrink-0 compact"
-                    aria-label="戻す"
+                    onClick={clearDone}
+                    className="text-sm text-red-600 font-semibold compact px-3 py-1"
                   >
-                    ✓
+                    まとめて消す
                   </button>
-                  <span className="flex-1 text-base py-3 line-through break-words">
-                    {m.text}
-                  </span>
-                  <button
-                    onClick={() => remove(m.id)}
-                    className="w-11 h-11 rounded-full bg-red-50 text-red-600 flex items-center justify-center shrink-0 text-xl font-bold compact"
-                    aria-label="削除"
-                  >
-                    ✕
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </section>
+                </div>
+                <ul className="bg-background rounded-2xl border border-border divide-y divide-border overflow-hidden opacity-75">
+                  {done.map((m) => (
+                    <li
+                      key={m.id}
+                      className="flex items-center gap-2 pl-2 pr-2"
+                    >
+                      <button
+                        onClick={() => toggle(m.id)}
+                        className="w-11 h-11 rounded-full bg-primary border-2 border-primary flex items-center justify-center text-xl text-white shrink-0 compact"
+                        aria-label="戻す"
+                      >
+                        ✓
+                      </button>
+                      <span className="flex-1 text-base py-3 line-through break-words">
+                        {m.text}
+                      </span>
+                      <button
+                        onClick={() => remove(m.id)}
+                        className="w-11 h-11 rounded-full bg-red-50 text-red-600 flex items-center justify-center shrink-0 text-xl font-bold compact"
+                        aria-label="削除"
+                      >
+                        ✕
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+          </>
         )}
       </main>
     </>

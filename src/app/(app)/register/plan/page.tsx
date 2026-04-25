@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
 import { useCurrentUser } from "@/components/UserContext";
 import { todayYmd } from "@/lib/date";
-import { getPlans, savePlans, uid } from "@/lib/storage";
+import { addPlan } from "@/lib/db";
 
 const PRESETS = ["犬美容", "私病院", "買い物"];
 
@@ -16,24 +16,29 @@ export default function PlanRegisterPage() {
   const [title, setTitle] = useState("");
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
+  const [saving, setSaving] = useState(false);
 
-  const save = () => {
+  const save = async () => {
     if (!title.trim()) {
       alert("予定の内容を入れてください");
       return;
     }
-    const plans = getPlans();
-    plans.push({
-      id: uid(),
-      userId: user.id,
-      date,
-      title: title.trim(),
-      startTime: start || undefined,
-      endTime: end || undefined,
-    });
-    savePlans(plans);
-    alert("予定を登録しました");
-    router.push("/calendar");
+    setSaving(true);
+    try {
+      await addPlan({
+        userId: user.id,
+        date,
+        title: title.trim(),
+        startTime: start || undefined,
+        endTime: end || undefined,
+      });
+      alert("予定を登録しました");
+      router.push("/calendar");
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "登録に失敗しました");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -97,9 +102,10 @@ export default function PlanRegisterPage() {
 
         <button
           onClick={save}
-          className="w-full rounded-2xl bg-primary text-white text-xl font-bold py-4"
+          disabled={saving}
+          className="w-full rounded-2xl bg-primary text-white text-xl font-bold py-4 disabled:opacity-60"
         >
-          ✓ 登録する
+          {saving ? "登録中…" : "✓ 登録する"}
         </button>
       </main>
     </>

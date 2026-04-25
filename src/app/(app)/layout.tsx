@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BottomTabs } from "@/components/BottomTabs";
 import { UserProvider } from "@/components/UserContext";
-import { getCurrentUser, seedIfEmpty } from "@/lib/storage";
+import { getCurrentUser } from "@/lib/storage";
 import { USERS, type User } from "@/lib/types";
 
 export default function AppLayout({
@@ -16,7 +16,6 @@ export default function AppLayout({
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    seedIfEmpty();
     const id = getCurrentUser();
     if (!id) {
       router.replace("/");

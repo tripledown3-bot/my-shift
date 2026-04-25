@@ -2,14 +2,13 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getCurrentUser, seedIfEmpty, setCurrentUser } from "@/lib/storage";
+import { getCurrentUser, setCurrentUser } from "@/lib/storage";
 import { USERS, type UserId } from "@/lib/types";
 
 export default function HomePage() {
   const router = useRouter();
 
   useEffect(() => {
-    seedIfEmpty();
     const current = getCurrentUser();
     if (current) router.replace("/calendar");
   }, [router]);

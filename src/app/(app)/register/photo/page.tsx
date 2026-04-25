@@ -11,7 +11,7 @@ import {
   parseYmd,
   ymd,
 } from "@/lib/date";
-import { getShifts, saveShifts, uid } from "@/lib/storage";
+import { addShifts } from "@/lib/db";
 import { findPattern, getPatternsForUser } from "@/lib/types";
 
 type Draft = {
@@ -145,7 +145,9 @@ export default function PhotoRegisterPage() {
     });
   };
 
-  const save = () => {
+  const [saving, setSaving] = useState(false);
+
+  const save = async () => {
     if (drafts.length === 0) {
       alert("登録するシフトがありません");
       return;
@@ -155,24 +157,27 @@ export default function PhotoRegisterPage() {
       alert("「?」のままの日があります。種別を選んでから登録してください。");
       return;
     }
-    const shifts = getShifts();
-    const next = [
-      ...shifts,
-      ...drafts.map((d) => {
-        const p = findPattern(d.patternCode);
-        return {
-          id: uid(),
-          userId: user.id,
-          date: d.date,
-          patternCode: d.patternCode,
-          startTime: p?.isLeave ? undefined : p?.startTime,
-          endTime: p?.isLeave ? undefined : p?.endTime,
-        };
-      }),
-    ];
-    saveShifts(next);
-    alert(`${drafts.length}件のシフトを登録しました`);
-    router.push("/calendar");
+    setSaving(true);
+    try {
+      await addShifts(
+        drafts.map((d) => {
+          const p = findPattern(d.patternCode);
+          return {
+            userId: user.id,
+            date: d.date,
+            patternCode: d.patternCode,
+            startTime: p?.isLeave ? undefined : p?.startTime,
+            endTime: p?.isLeave ? undefined : p?.endTime,
+          };
+        })
+      );
+      alert(`${drafts.length}件のシフトを登録しました`);
+      router.push("/calendar");
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "登録に失敗しました");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const cells = daysInMonthGrid(cursor.getFullYear(), cursor.getMonth());
@@ -374,9 +379,10 @@ export default function PhotoRegisterPage() {
           <div className="max-w-md mx-auto">
             <button
               onClick={save}
-              className="w-full rounded-2xl bg-primary text-white text-xl font-bold py-4 shadow-lg"
+              disabled={saving}
+              className="w-full rounded-2xl bg-primary text-white text-xl font-bold py-4 shadow-lg disabled:opacity-60"
             >
-              ✓ {drafts.length}件をカレンダーに登録
+              {saving ? "登録中…" : `✓ ${drafts.length}件をカレンダーに登録`}
             </button>
           </div>
         </div>

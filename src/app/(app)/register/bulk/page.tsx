@@ -10,7 +10,7 @@ import {
   monthLabel,
   ymd,
 } from "@/lib/date";
-import { getShifts, saveShifts, uid } from "@/lib/storage";
+import { addShifts } from "@/lib/db";
 import { SHIFT_PATTERNS, getPatternsForUser } from "@/lib/types";
 
 export default function BulkRegisterPage() {
@@ -48,21 +48,28 @@ export default function BulkRegisterPage() {
     });
   };
 
-  const save = () => {
+  const [saving, setSaving] = useState(false);
+
+  const save = async () => {
     if (selected.size === 0) return;
-    const shifts = getShifts();
     const p = SHIFT_PATTERNS.find((x) => x.code === patternCode);
     const adds = Array.from(selected).map((date) => ({
-      id: uid(),
       userId: user.id,
       date,
       patternCode: patternCode ?? undefined,
       startTime: p?.isLeave ? undefined : start,
       endTime: p?.isLeave ? undefined : end,
     }));
-    saveShifts([...shifts, ...adds]);
-    alert(`${adds.length}件のシフトを登録しました`);
-    router.push("/calendar");
+    setSaving(true);
+    try {
+      await addShifts(adds);
+      alert(`${adds.length}件のシフトを登録しました`);
+      router.push("/calendar");
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "登録に失敗しました");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -203,10 +210,12 @@ export default function BulkRegisterPage() {
         <div className="max-w-md mx-auto">
           <button
             onClick={save}
-            disabled={selected.size === 0}
+            disabled={selected.size === 0 || saving}
             className="w-full rounded-2xl bg-primary text-white text-xl font-bold py-4 shadow-lg disabled:opacity-50 disabled:bg-muted"
           >
-            {selected.size === 0
+            {saving
+              ? "登録中…"
+              : selected.size === 0
               ? "日にちを選んでください"
               : `✓ ${selected.size}日分を登録する${
                   patternCode ? `（${patternCode}）` : ""
