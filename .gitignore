@@ -40,6 +40,9 @@ yarn-error.log*
 # debug artifacts
 .debug-last-ocr.json
 
+# QR code（個人配布用）
+my-shift-qr.png
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

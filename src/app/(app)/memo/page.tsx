@@ -18,6 +18,8 @@ export default function MemoPage() {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingText, setEditingText] = useState("");
 
   const reload = async () => {
     try {
@@ -82,6 +84,35 @@ export default function MemoPage() {
     }
   };
 
+  const startEdit = (m: Memo) => {
+    setEditingId(m.id);
+    setEditingText(m.text);
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditingText("");
+  };
+
+  const saveEdit = async (id: string) => {
+    const v = editingText.trim();
+    if (!v) {
+      cancelEdit();
+      return;
+    }
+    setMemos((prev) =>
+      prev.map((m) => (m.id === id ? { ...m, text: v } : m))
+    );
+    setEditingId(null);
+    setEditingText("");
+    try {
+      await updateMemo(id, { text: v });
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "更新に失敗しました");
+      await reload();
+    }
+  };
+
   const clearDone = async () => {
     if (done.length === 0) return;
     if (!confirm(`完了した${done.length}件を消しますか？`)) return;
@@ -110,6 +141,10 @@ export default function MemoPage() {
             <span className="font-semibold">ちょっとしたやる事（タスク）</span>の管理に使えます。
             <br />
             例：牛乳・薬を飲む・電球を買う など
+            <br />
+            <span className="text-xs">
+              テキストをタップで編集・◯で完了・✕で削除
+            </span>
           </p>
         </section>
 
@@ -160,9 +195,30 @@ export default function MemoPage() {
                       >
                         <span className="sr-only">未完了</span>
                       </button>
-                      <span className="flex-1 text-base py-3 break-words">
-                        {m.text}
-                      </span>
+                      {editingId === m.id ? (
+                        <input
+                          type="text"
+                          value={editingText}
+                          onChange={(e) => setEditingText(e.target.value)}
+                          onBlur={() => saveEdit(m.id)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") saveEdit(m.id);
+                            if (e.key === "Escape") cancelEdit();
+                          }}
+                          autoFocus
+                          className="flex-1 text-base py-2 px-2 rounded-lg border-2 border-primary bg-white"
+                          style={{ minHeight: 0 }}
+                        />
+                      ) : (
+                        <button
+                          onClick={() => startEdit(m)}
+                          className="flex-1 text-base py-3 text-left break-words compact"
+                          style={{ minHeight: 0 }}
+                          aria-label="編集"
+                        >
+                          {m.text}
+                        </button>
+                      )}
                       <button
                         onClick={() => remove(m.id)}
                         className="w-11 h-11 rounded-full bg-red-50 text-red-600 flex items-center justify-center shrink-0 text-xl font-bold compact"
@@ -202,9 +258,30 @@ export default function MemoPage() {
                       >
                         ✓
                       </button>
-                      <span className="flex-1 text-base py-3 line-through break-words">
-                        {m.text}
-                      </span>
+                      {editingId === m.id ? (
+                        <input
+                          type="text"
+                          value={editingText}
+                          onChange={(e) => setEditingText(e.target.value)}
+                          onBlur={() => saveEdit(m.id)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") saveEdit(m.id);
+                            if (e.key === "Escape") cancelEdit();
+                          }}
+                          autoFocus
+                          className="flex-1 text-base py-2 px-2 rounded-lg border-2 border-primary bg-white"
+                          style={{ minHeight: 0 }}
+                        />
+                      ) : (
+                        <button
+                          onClick={() => startEdit(m)}
+                          className="flex-1 text-base py-3 text-left line-through break-words compact"
+                          style={{ minHeight: 0 }}
+                          aria-label="編集"
+                        >
+                          {m.text}
+                        </button>
+                      )}
                       <button
                         onClick={() => remove(m.id)}
                         className="w-11 h-11 rounded-full bg-red-50 text-red-600 flex items-center justify-center shrink-0 text-xl font-bold compact"
