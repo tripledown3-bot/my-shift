@@ -141,10 +141,6 @@ export default function MemoPage() {
             <span className="font-semibold">ちょっとしたやる事（タスク）</span>の管理に使えます。
             <br />
             例：牛乳・薬を飲む・電球を買う など
-            <br />
-            <span className="text-xs">
-              テキストをタップで編集・◯で完了・✕で削除
-            </span>
           </p>
         </section>
 
@@ -174,9 +170,12 @@ export default function MemoPage() {
         ) : (
           <>
             <section>
-              <h3 className="font-bold text-base mb-2 px-1">
+              <h3 className="font-bold text-base mb-1 px-1">
                 のこり（{remaining.length}件）
               </h3>
+              <p className="text-xs text-muted mb-2 px-1">
+                文字をタップで編集　◯で完了　✕で削除
+              </p>
               {remaining.length === 0 ? (
                 <p className="text-muted text-center py-4 bg-white rounded-xl border border-border text-base">
                   メモはありません
