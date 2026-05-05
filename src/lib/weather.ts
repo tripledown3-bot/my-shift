@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 
-// 福岡（博多区）座標
-const LAT = 33.5904;
-const LON = 130.4017;
+// 福岡県粕屋郡志免町 座標
+const LAT = 33.5731;
+const LON = 130.4719;
 
 export type WeatherDay = {
   date: string;
@@ -21,7 +21,7 @@ export type WeatherForecast = {
   tomorrow: WeatherDay;
 };
 
-const CACHE_KEY = "my-shift:weather-cache-v2";
+const CACHE_KEY = "my-shift:weather-cache-v3-shime";
 const CACHE_TTL_MS = 60 * 60 * 1000; // 1時間
 
 function emojiFromCode(code: number): { emoji: string; label: string } {
