@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import type { Plan } from "@/lib/types";
 
 const PRESETS_BY_USER: Record<"mom" | "son", string[]> = {
-  mom: ["犬美容", "私病院", "買い物"],
+  mom: ["犬美容", "私病院", "美容室", "買い物"],
   son: ["餌", "買い物"],
 };
 
