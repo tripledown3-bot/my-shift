@@ -68,12 +68,12 @@ export function PlanEditSheet({ plan, onSave, onDelete, onClose }: Props) {
             onChange={(e) => setTitle(e.target.value)}
             className="w-full rounded-lg border border-border px-3 bg-white"
           />
-          <div className="flex flex-wrap gap-2 mt-2">
+          <div className="grid grid-cols-3 gap-2 mt-2">
             {PRESETS_BY_USER[plan.userId].map((p) => (
               <button
                 key={p}
                 onClick={() => setTitle(p)}
-                className="px-3 py-2 rounded-full bg-background border border-border text-base"
+                className="px-2 py-2 rounded-full bg-background border border-border text-base"
               >
                 {p}
               </button>
