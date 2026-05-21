@@ -129,7 +129,7 @@ export function ShiftEditSheet({
             <div className="font-bold mb-2">時間（直接編集も可）</div>
             <div className="flex items-center gap-2">
               <input
-                type="time"
+                type="time" step={900}
                 value={startTime}
                 onChange={(e) => {
                   setStartTime(e.target.value);
@@ -139,7 +139,7 @@ export function ShiftEditSheet({
               />
               <span>〜</span>
               <input
-                type="time"
+                type="time" step={900}
                 value={endTime}
                 onChange={(e) => {
                   setEndTime(e.target.value);

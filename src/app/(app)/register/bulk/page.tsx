@@ -128,7 +128,7 @@ export default function BulkRegisterPage() {
           <h3 className="font-bold text-lg mb-2">② 時間</h3>
           <div className="flex items-center gap-2">
             <input
-              type="time"
+              type="time" step={900}
               value={start}
               onChange={(e) => {
                 setStart(e.target.value);
@@ -138,7 +138,7 @@ export default function BulkRegisterPage() {
             />
             <span>〜</span>
             <input
-              type="time"
+              type="time" step={900}
               value={end}
               onChange={(e) => {
                 setEnd(e.target.value);

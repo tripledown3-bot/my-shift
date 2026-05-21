@@ -335,17 +335,17 @@ export default function CalendarPage() {
                         </span>
                       );
                     })}
-                    {dayPlans.length > 0 && (
+                    {dayPlans.slice(0, 2).map((p, idx) => (
                       <span
-                        className="text-[10px] leading-[1.15] rounded px-0.5 py-[1px] bg-accent/20 text-foreground font-bold text-center break-all overflow-hidden"
-                        style={{
-                          display: "-webkit-box",
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: "vertical",
-                        }}
+                        key={p.id ?? idx}
+                        className="text-[10px] leading-[1.2] rounded px-0.5 py-[1px] bg-accent/20 text-foreground font-bold text-center truncate"
                       >
-                        {dayPlans[0].title.slice(0, 8)}
-                        {dayPlans.length > 1 ? "…" : ""}
+                        {p.title.slice(0, 4)}
+                      </span>
+                    ))}
+                    {dayPlans.length > 2 && (
+                      <span className="text-[10px] leading-[1.2] text-muted font-bold text-center">
+                        +{dayPlans.length - 2}
                       </span>
                     )}
                   </div>

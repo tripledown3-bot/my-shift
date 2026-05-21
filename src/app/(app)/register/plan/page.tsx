@@ -8,7 +8,7 @@ import { todayYmd } from "@/lib/date";
 import { addPlan } from "@/lib/db";
 
 const PRESETS_BY_USER: Record<"mom" | "son", string[]> = {
-  mom: ["犬美容", "私病院", "美容室", "買い物"],
+  mom: ["犬美容", "私病院", "美容室", "買い物", "店休日"],
   son: ["餌", "買い物"],
 };
 
@@ -87,14 +87,14 @@ export default function PlanRegisterPage() {
             </label>
             <div className="flex items-center gap-2">
               <input
-                type="time"
+                type="time" step={900}
                 value={start}
                 onChange={(e) => setStart(e.target.value)}
                 className="flex-1 rounded-lg border border-border px-3 bg-white text-center"
               />
               <span>〜</span>
               <input
-                type="time"
+                type="time" step={900}
                 value={end}
                 onChange={(e) => setEnd(e.target.value)}
                 className="flex-1 rounded-lg border border-border px-3 bg-white text-center"
